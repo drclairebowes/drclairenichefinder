@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "framework": null,
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "api/niche.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/niche", "dest": "/api/niche.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
