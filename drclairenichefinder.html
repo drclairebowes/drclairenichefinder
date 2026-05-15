@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Niche — Dr. Claire Bowes, DPT</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #111; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
+  .app { width: 100%; max-width: 640px; }
+  .progress-bar { height: 3px; background: #e5e5e5; border-radius: 2px; margin-bottom: 2rem; }
+  .progress-fill { height: 100%; background: #111; border-radius: 2px; transition: width 0.4s ease; }
+  .step { display: none; }
+  .step.active { display: block; }
+  .step-label { font-size: 12px; color: #999; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .question { font-size: 20px; font-weight: 500; color: #111; line-height: 1.4; margin-bottom: 0.5rem; }
+  .hint { font-size: 14px; color: #666; margin-bottom: 1.5rem; line-height: 1.6; }
+  .multi-note { font-size: 12px; color: #aaa; margin-bottom: 1rem; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem; }
+  .pill { border: 1px solid #ddd; border-radius: 20px; padding: 8px 16px; font-size: 14px; color: #111; background: #fff; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .pill:hover { border-color: #999; background: #f9f9f9; }
+  .pill.selected { background: #111; border-color: #111; color: #fff; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .card { border: 1px solid #e5e5e5; border-radius: 12px; padding: 1rem; cursor: pointer; background: #fff; transition: all 0.15s; text-align: left; font-family: inherit; }
+  .card:hover { border-color: #bbb; background: #f9f9f9; }
+  .card.selected { border-color: #111; background: #111; }
+  .card-icon { font-size: 20px; margin-bottom: 8px; display: block; }
+  .card-title { font-size: 13px; font-weight: 500; color: #111; }
+  .card-sub { font-size: 11px; color: #888; margin-top: 2px; }
+  .card.selected .card-title { color: #fff; }
+  .card.selected .card-sub { color: #aaa; }
+  .text-input { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px 14px; font-size: 15px; color: #111; background: #fff; font-family: inherit; margin-bottom: 1.5rem; resize: none; line-height: 1.6; }
+  .text-input:focus { outline: none; border-color: #111; }
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
+  .btn { border: 1px solid #ddd; border-radius: 8px; padding: 10px 24px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; background: #fff; color: #111; font-family: inherit; }
+  .btn:hover { background: #f5f5f5; }
+  .btn-primary { background: #111; color: #fff; border-color: #111; }
+  .btn-primary:hover { background: #333; }
+  .loading { text-align: center; padding: 3rem 1rem; display: none; }
+  .loading-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 1rem; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #bbb; animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-8px)} }
+  .result-section { display: none; }
+  .result-card { border: 1px solid #e5e5e5; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; background: #fff; }
+  .result-card-dark { border: 1px solid #e5e5e5; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; background: #f9f9f9; }
+  .result-label { font-size: 11px; font-weight: 500; color: #aaa; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .result-title { font-size: 18px; font-weight: 500; color: #111; margin-bottom: 0.5rem; }
+  .result-desc { font-size: 14px; color: #555; line-height: 1.7; }
+  .sub-tag { display: inline-block; border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 600; background: #111; color: #fff; margin-right: 8px; }
+  .divider { height: 1px; background: #f0f0f0; margin: 1.5rem 0; }
+  .pillar-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+  .pillar-row:last-child { border-bottom: none; }
+  .pillar-num { font-size: 12px; font-weight: 600; color: #bbb; min-width: 20px; padding-top: 2px; }
+  .pillar-text { font-size: 14px; color: #111; line-height: 1.5; }
+  .hook-quote { font-size: 15px; font-style: italic; color: #111; line-height: 1.7; padding-left: 1rem; border-left: 2px solid #111; margin-top: 0.75rem; }
+  .teaser-box { border: 1px solid #e5e5e5; border-radius: 12px; padding: 1.5rem; background: #f9f9f9; text-align: center; margin-top: 1rem; }
+  .teaser-title { font-size: 16px; font-weight: 500; color: #111; margin-bottom: 0.5rem; }
+  .teaser-desc { font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 1.25rem; }
+  .restart-btn { font-size: 13px; color: #aaa; background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; font-family: inherit; margin-top: 1rem; display: block; margin-left: auto; margin-right: auto; }
+  .restart-btn:hover { color: #555; }
+  .error-box { border: 1px solid #fca5a5; border-radius: 8px; padding: 1rem; background: #fef2f2; color: #991b1b; font-size: 14px; line-height: 1.6; margin-bottom: 1rem; display: none; }
+  @media (max-width: 480px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .question { font-size: 18px; }
+    body { padding: 1.5rem 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+
+  <div id="questions">
+
+    <div class="step active" id="step-1">
+      <div class="step-label">Step 1 of 6</div>
+      <div class="question">What is your professional background or area of expertise?</div>
+      <div class="hint">This is your credibility foundation. Select everything that applies.</div>
+      <div class="multi-note">Select all that apply</div>
+      <div class="cards" id="cards-1">
+        <button class="card" data-value="Physical therapy / rehab"><span class="card-icon">🦴</span><div class="card-title">Physical therapy / rehab</div></button>
+        <button class="card" data-value="Nutrition / dietetics"><span class="card-icon">🥗</span><div class="card-title">Nutrition / dietetics</div></button>
+        <button class="card" data-value="Personal training / fitness"><span class="card-icon">💪</span><div class="card-title">Personal training / fitness</div></button>
+        <button class="card" data-value="Mental health / therapy"><span class="card-icon">🧠</span><div class="card-title">Mental health / therapy</div></button>
+        <button class="card" data-value="Nursing / medicine"><span class="card-icon">🩺</span><div class="card-title">Nursing / medicine</div></button>
+        <button class="card" data-value="Chiropractic / sports medicine"><span class="card-icon">⚕️</span><div class="card-title">Chiropractic / sports medicine</div></button>
+        <button class="card" data-value="Occupational therapy"><span class="card-icon">🖐️</span><div class="card-title">Occupational therapy</div></button>
+        <button class="card" data-value="Other health / wellness"><span class="card-icon">✨</span><div class="card-title">Other health / wellness</div></button>
+      </div>
+      <textarea class="text-input" id="other-expertise" placeholder="Or describe your background in your own words..." rows="2"></textarea>
+    </div>
+
+    <div class="step" id="step-2">
+      <div class="step-label">Step 2 of 6</div>
+      <div class="question">Who do you most want to help?</div>
+      <div class="hint">Think about who naturally finds you, who you are most drawn to help, and who you understand deeply.</div>
+      <div class="multi-note">Select all that apply</div>
+      <div class="cards" id="cards-2">
+        <button class="card" data-value="Women 30-50"><span class="card-icon">👩</span><div class="card-title">Women 30–50</div><div class="card-sub">General wellness, longevity</div></button>
+        <button class="card" data-value="Athletes and active people"><span class="card-icon">🏃</span><div class="card-title">Athletes / active people</div><div class="card-sub">Performance, injury prevention</div></button>
+        <button class="card" data-value="Postpartum and new moms"><span class="card-icon">👶</span><div class="card-title">New moms / postpartum</div><div class="card-sub">Recovery, pelvic health</div></button>
+        <button class="card" data-value="People with chronic pain"><span class="card-icon">🔴</span><div class="card-title">Chronic pain sufferers</div><div class="card-sub">Long-term relief, rehab</div></button>
+        <button class="card" data-value="Older adults 50+"><span class="card-icon">🧓</span><div class="card-title">Adults 50+</div><div class="card-sub">Mobility, strength, longevity</div></button>
+        <button class="card" data-value="Other health professionals"><span class="card-icon">👩‍⚕️</span><div class="card-title">Other health pros</div><div class="card-sub">Education, business</div></button>
+        <button class="card" data-value="People with specific injuries"><span class="card-icon">🦵</span><div class="card-title">Specific injury / condition</div><div class="card-sub">Knee, back, shoulder, etc.</div></button>
+        <button class="card" data-value="General wellness seekers"><span class="card-icon">🌿</span><div class="card-title">General wellness seekers</div><div class="card-sub">Healthy lifestyle, prevention</div></button>
+      </div>
+    </div>
+
+    <div class="step" id="step-3">
+      <div class="step-label">Step 3 of 6</div>
+      <div class="question">What is the biggest problem you have personally lived through that your audience is also facing?</div>
+      <div class="hint">Your story is your most powerful marketing asset. The more specific and personal, the better.</div>
+      <textarea class="text-input" id="personal-problem" placeholder="e.g. I burned out completely as a nurse after 10 years and had to rebuild my health from scratch. I now help other nurses avoid the burnout spiral before it happens..." rows="5"></textarea>
+    </div>
+
+    <div class="step" id="step-4">
+      <div class="step-label">Step 4 of 6</div>
+      <div class="question">What do people ask you about most — in DMs, comments, or in your clinical work?</div>
+      <div class="hint">These are the topics your content should live in. Where people ask questions, there is demand.</div>
+      <div class="multi-note">Select all that apply</div>
+      <div class="pills" id="pills-4">
+        <button class="pill" data-value="Pain relief and rehab exercises">Pain relief and rehab exercises</button>
+        <button class="pill" data-value="Specific injury recovery">Specific injury recovery</button>
+        <button class="pill" data-value="How to avoid surgery">How to avoid surgery</button>
+        <button class="pill" data-value="Getting back to sport or running">Getting back to sport or running</button>
+        <button class="pill" data-value="Weight loss and body composition">Weight loss and body composition</button>
+        <button class="pill" data-value="Postpartum recovery">Postpartum recovery</button>
+        <button class="pill" data-value="Strength training safely">Strength training safely</button>
+        <button class="pill" data-value="Eating for a specific goal">Eating for a specific goal</button>
+        <button class="pill" data-value="Mental health and burnout">Mental health and burnout</button>
+        <button class="pill" data-value="How to build an online health business">Building an online health business</button>
+        <button class="pill" data-value="Longevity and healthy aging">Longevity and healthy aging</button>
+        <button class="pill" data-value="Mobility and flexibility">Mobility and flexibility</button>
+      </div>
+      <textarea class="text-input" id="other-asked" placeholder="Anything else people constantly come to you about?" rows="2"></textarea>
+    </div>
+
+    <div class="step" id="step-5">
+      <div class="step-label">Step 5 of 6</div>
+      <div class="question">What does your content naturally look like when you show up online?</div>
+      <div class="hint">Play to your strengths. The best content format is the one you will actually stick with.</div>
+      <div class="multi-note">Select all that apply</div>
+      <div class="cards" id="cards-5">
+        <button class="card" data-value="Short video tutorials"><span class="card-icon">📱</span><div class="card-title">Short video tutorials</div><div class="card-sub">Reels, TikToks, demos</div></button>
+        <button class="card" data-value="Step-by-step written guides"><span class="card-icon">📋</span><div class="card-title">Written guides and PDFs</div><div class="card-sub">Protocols, checklists</div></button>
+        <button class="card" data-value="Exercise and movement demos"><span class="card-icon">🏋️</span><div class="card-title">Exercise and movement demos</div><div class="card-sub">Showing, not just telling</div></button>
+        <button class="card" data-value="Talking to camera storytelling"><span class="card-icon">🎙️</span><div class="card-title">Talking to camera</div><div class="card-sub">Story-led, personal, raw</div></button>
+        <button class="card" data-value="Educational carousels and graphics"><span class="card-icon">🎓</span><div class="card-title">Educational carousels</div><div class="card-sub">Swipe-through education</div></button>
+        <button class="card" data-value="Day in the life and behind the scenes"><span class="card-icon">🎬</span><div class="card-title">Day in the life</div><div class="card-sub">Behind the scenes, relatable</div></button>
+      </div>
+    </div>
+
+    <div class="step" id="step-6">
+      <div class="step-label">Step 6 of 6</div>
+      <div class="question">What is your biggest goal with content creation and an online business?</div>
+      <div class="hint">Be honest. This shapes everything about how your niche needs to work for you.</div>
+      <div class="cards" id="cards-6">
+        <button class="card" data-value="Replace my clinical income completely"><span class="card-icon">💰</span><div class="card-title">Replace my clinical income completely</div><div class="card-sub">Go full-time online</div></button>
+        <button class="card" data-value="Add passive income alongside my practice"><span class="card-icon">📈</span><div class="card-title">Add passive income alongside my practice</div><div class="card-sub">Keep the day job, build the side stream</div></button>
+        <button class="card" data-value="Build authority and become the go-to expert in my space"><span class="card-icon">🏆</span><div class="card-title">Become the go-to expert in my space</div><div class="card-sub">Brand, authority, recognition</div></button>
+        <button class="card" data-value="Help more people than I can reach in person"><span class="card-icon">🌍</span><div class="card-title">Help more people than I can reach in person</div><div class="card-sub">Scale my impact beyond the clinic</div></button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="nav" id="nav-bar">
+    <button class="btn" id="back-btn" onclick="goBack()" style="display:none">Back</button>
+    <div></div>
+    <button class="btn btn-primary" id="next-btn" onclick="goNext()">Continue</button>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="loading-dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <div style="font-size:15px; color:#888; margin-top:0.5rem">Building your personalized niche profile...</div>
+  </div>
+
+  <div class="result-section" id="results">
+    <div style="margin-bottom:1.5rem">
+      <div style="font-size:22px; font-weight:500; color:#111; margin-bottom:0.4rem">Your niche profile</div>
+      <div style="font-size:14px; color:#666; line-height:1.6">Here is exactly where you should be showing up, who you should be talking to, and what you should be posting about.</div>
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+
+    <div class="result-card">
+      <div class="result-label">Your main niche</div>
+      <div class="result-title" id="main-niche-title"></div>
+      <div class="result-desc" id="main-niche-desc"></div>
+    </div>
+
+    <div id="sub-niches-container"></div>
+
+    <div class="divider"></div>
+
+    <div class="result-card">
+      <div class="result-label">Your content pillars</div>
+      <div class="result-desc" style="margin-bottom:1rem">Post about these topics every single day. Every reel, carousel, and story should connect back to at least one of these.</div>
+      <div id="content-pillars"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="result-card-dark">
+      <div class="result-label">Your personal hook</div>
+      <div class="result-desc" style="margin-bottom:0.5rem">Use this as the foundation of your bio, your intro on every video, and your brand story.</div>
+      <div class="hook-quote" id="personal-hook"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="teaser-box">
+      <div class="teaser-title">Now you know your niche. Next: what do you sell?</div>
+      <div class="teaser-desc">You have your niche, your audience, and your content pillars. The next step is turning all of this into a digital product that sells every single day — even while you sleep. That is exactly what my course teaches you, step by step, completely templated.</div>
+      <a href="https://mailchi.mp/1c99ecbfc3b0/zjzy6ru9bo" target="_blank" style="display:inline-block; background:#111; color:#fff; border-radius:8px; padding:12px 28px; font-size:14px; font-weight:500; text-decoration:none; margin-bottom:4px;">Join the waitlist — 50% off at launch</a>
+    </div>
+
+    <div style="text-align:center">
+      <button class="restart-btn" onclick="restart()">Start over</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let currentStep = 1;
+const totalSteps = 6;
+const answers = {};
+
+function getSelections(id) {
+  const el = document.getElementById(id);
+  if (!el) return [];
+  return Array.from(el.querySelectorAll('.card.selected, .pill.selected')).map(e => e.dataset.value);
+}
+
+function updateProgress() {
+  document.getElementById('progress').style.width = ((currentStep - 1) / totalSteps * 100) + '%';
+}
+
+function goNext() {
+  collectStep();
+  if (currentStep < totalSteps) {
+    document.getElementById('step-' + currentStep).classList.remove('active');
+    currentStep++;
+    document.getElementById('step-' + currentStep).classList.add('active');
+    updateProgress();
+    document.getElementById('back-btn').style.display = 'block';
+    document.getElementById('next-btn').textContent = currentStep === totalSteps ? 'Show me my niche' : 'Continue';
+    window.scrollTo(0, 0);
+  } else {
+    showResults();
+  }
+}
+
+function goBack() {
+  document.getElementById('step-' + currentStep).classList.remove('active');
+  currentStep--;
+  document.getElementById('step-' + currentStep).classList.add('active');
+  updateProgress();
+  document.getElementById('next-btn').textContent = currentStep === totalSteps ? 'Show me my niche' : 'Continue';
+  if (currentStep === 1) document.getElementById('back-btn').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+function collectStep() {
+  const maps = {1:'cards-1',2:'cards-2',4:'pills-4',5:'cards-5',6:'cards-6'};
+  if (maps[currentStep]) answers['step'+currentStep] = getSelections(maps[currentStep]);
+  if (currentStep === 1) answers.otherExpertise = document.getElementById('other-expertise').value.trim();
+  if (currentStep === 3) answers.personalProblem = document.getElementById('personal-problem').value.trim();
+  if (currentStep === 4) answers.otherAsked = document.getElementById('other-asked').value.trim();
+}
+
+['cards-1','cards-2','cards-5','cards-6'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', e => { const c = e.target.closest('.card'); if (c) c.classList.toggle('selected'); });
+});
+
+document.getElementById('pills-4').addEventListener('click', e => {
+  const p = e.target.closest('.pill'); if (p) p.classList.toggle('selected');
+});
+
+function buildPrompt() {
+  const expertise = (answers.step1 || []).join(', ') || answers.otherExpertise || 'not specified';
+  const otherExpertise = answers.otherExpertise || '';
+  const audience = (answers.step2 || []).join(', ') || 'not specified';
+  const personalStory = answers.personalProblem || 'not provided';
+  const topics = [...(answers.step4 || [])];
+  if (answers.otherAsked) topics.push(answers.otherAsked);
+  const topicsStr = topics.join(', ') || 'not specified';
+  const contentFormats = (answers.step5 || []).join(', ') || 'not specified';
+  const goal = (answers.step6 || [])[0] || 'not specified';
+
+  return `You are a niche strategy expert for health and wellness content creators. Based on the quiz answers below, generate a fully personalized niche profile for THIS specific person. Do NOT use generic advice. Do NOT reference physical therapy, knee pain, or any specific condition unless the person explicitly mentioned it. Base everything entirely on what they told you.
+
+QUIZ ANSWERS:
+- Professional background: ${expertise}${otherExpertise ? ' (additional detail: ' + otherExpertise + ')' : ''}
+- Who they want to help: ${audience}
+- Their personal story / lived experience: ${personalStory}
+- Topics people ask them about most: ${topicsStr}
+- Content formats they use: ${contentFormats}
+- Their main goal: ${goal}
+
+Return a JSON object with EXACTLY this structure (no markdown, no backticks, just raw JSON):
+{
+  "mainNiche": "A specific one-sentence niche statement tailored to their background and audience",
+  "mainDesc": "2-3 sentences explaining why this niche works for them specifically, referencing their actual background and audience",
+  "subNiches": [
+    "Sub-niche 1 specific to their answers",
+    "Sub-niche 2 specific to their answers",
+    "Sub-niche 3 specific to their answers"
+  ],
+  "pillars": [
+    "Content pillar 1 tailored to their expertise and audience",
+    "Content pillar 2 tailored to their expertise and audience",
+    "Content pillar 3 tailored to their expertise and audience",
+    "Content pillar 4 tailored to their expertise and audience",
+    "Content pillar 5 tailored to their expertise and audience"
+  ],
+  "hook": "A 2-3 sentence personal brand hook written in first person, based on their actual story and background. If they shared a personal story, incorporate it. Make it specific, not generic."
+}`;
+}
+
+async function fetchNicheProfile() {
+  const prompt = buildPrompt();
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!response.ok) throw new Error('API request failed');
+
+  const data = await response.json();
+  const text = data.content[0].text.trim();
+  // Strip any accidental markdown fences
+  const clean = text.replace(/```json|```/g, '').trim();
+  return JSON.parse(clean);
+}
+
+function renderResults(p) {
+  document.getElementById('main-niche-title').textContent = p.mainNiche;
+  document.getElementById('main-niche-desc').textContent = p.mainDesc;
+
+  const subContainer = document.getElementById('sub-niches-container');
+  subContainer.innerHTML = '';
+  p.subNiches.forEach((sub, i) => {
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.style.marginBottom = '0.75rem';
+    card.innerHTML = '<div class="result-label">Sub-niche ' + (i+1) + '</div><div style="display:flex;align-items:center;gap:10px;margin-top:4px"><span class="sub-tag">#' + (i+1) + '</span><span style="font-size:15px;font-weight:500;color:#111">' + sub + '</span></div>';
+    subContainer.appendChild(card);
+  });
+
+  const pillarsEl = document.getElementById('content-pillars');
+  pillarsEl.innerHTML = p.pillars.map((pl, i) => '<div class="pillar-row"><div class="pillar-num">0' + (i+1) + '</div><div class="pillar-text">' + pl + '</div></div>').join('');
+
+  document.getElementById('personal-hook').textContent = p.hook;
+}
+
+async function showResults() {
+  collectStep();
+  document.getElementById('questions').style.display = 'none';
+  document.getElementById('nav-bar').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('progress').style.width = '100%';
+  document.getElementById('error-box').style.display = 'none';
+  window.scrollTo(0, 0);
+
+  try {
+    const profile = await fetchNicheProfile();
+    document.getElementById('loading').style.display = 'none';
+    renderResults(profile);
+    document.getElementById('results').style.display = 'block';
+  } catch (err) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('error-box').textContent = 'Something went wrong generating your profile. Please try refreshing and completing the quiz again.';
+    document.getElementById('error-box').style.display = 'block';
+  }
+
+  window.scrollTo(0, 0);
+}
+
+function restart() {
+  currentStep = 1;
+  Object.keys(answers).forEach(k => delete answers[k]);
+  document.querySelectorAll('.card.selected,.pill.selected').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('textarea').forEach(el => el.value = '');
+  document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+  document.getElementById('step-1').classList.add('active');
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('questions').style.display = 'block';
+  document.getElementById('nav-bar').style.display = 'flex';
+  document.getElementById('back-btn').style.display = 'none';
+  document.getElementById('next-btn').textContent = 'Continue';
+  document.getElementById('progress').style.width = '0%';
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
